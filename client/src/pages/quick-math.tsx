@@ -15,7 +15,7 @@ type Problem = {
   operator: '+' | '-';
   answer: number;
   options: number[];
-}
+};
 
 export default function QuickMath() {
   const [problem, setProblem] = useState<Problem | null>(null);
@@ -146,9 +146,9 @@ export default function QuickMath() {
           <>
             <div className="text-center mb-12">
               <h2 className="text-4xl mb-4 text-right flex justify-center gap-4 items-center">
-                <span>{problem.num2}</span>
-                <span>{problem.operator}</span>
                 <span>{problem.num1}</span>
+                <span>{problem.operator}</span>
+                <span>{problem.num2}</span>
                 <span>=</span>
                 <span>?</span>
               </h2>
