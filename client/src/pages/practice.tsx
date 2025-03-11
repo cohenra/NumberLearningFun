@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { NumberCard } from "@/components/ui/number-card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { SuccessAnimation } from "@/components/ui/success-animation";
 import { WrongAnswerAnimation } from "@/components/ui/wrong-answer-animation";
-import type { Number } from "@shared/schema";
+import type { Number, InsertProgress } from "@shared/schema";
 import { motion } from "framer-motion";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function Practice() {
   const { data: numbers } = useQuery<Number[]>({ 
@@ -19,12 +20,30 @@ export default function Practice() {
   const [showWrong, setShowWrong] = useState(false);
   const [wrongNumber, setWrongNumber] = useState("");
   const [score, setScore] = useState(0);
+  const [totalAttempts, setTotalAttempts] = useState(0);
+  const [startTime] = useState(Date.now());
+
+  const saveMutation = useMutation({
+    mutationFn: async (progress: InsertProgress) => {
+      await apiRequest("POST", "/api/progress", progress);
+    }
+  });
 
   useEffect(() => {
     if (numbers) {
       generateNewQuestion();
     }
   }, [numbers]);
+
+  const saveProgress = () => {
+    const timeTaken = Math.round((Date.now() - startTime) / 1000);
+    saveMutation.mutate({
+      correctAnswers: score,
+      totalQuestions: totalAttempts,
+      timeTaken,
+      numberRange: 10
+    });
+  };
 
   const generateNewQuestion = () => {
     if (!numbers || numbers.length < 4) return;
@@ -44,6 +63,8 @@ export default function Practice() {
   };
 
   const handleSelect = (selected: Number) => {
+    setTotalAttempts(prev => prev + 1);
+
     if (selected.id === currentNumber?.id) {
       setScore(prev => prev + 1);
       setShowSuccess(true);
@@ -57,6 +78,11 @@ export default function Practice() {
       setTimeout(() => {
         setShowWrong(false);
       }, 2000);
+    }
+
+    // Save progress every 5 attempts
+    if (totalAttempts > 0 && totalAttempts % 5 === 0) {
+      saveProgress();
     }
   };
 
@@ -73,7 +99,12 @@ export default function Practice() {
             <p className="text-xl mt-2">תשובות נכונות: {score}</p>
           </div>
           <Link href="/">
-            <Button variant="outline">חזרה</Button>
+            <Button 
+              variant="outline" 
+              onClick={saveProgress}
+            >
+              חזרה
+            </Button>
           </Link>
         </div>
 

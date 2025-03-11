@@ -23,7 +23,7 @@ export default function Home() {
             למד מספרים
           </Button>
         </Link>
-        
+
         <Link href="/practice">
           <Button 
             className="w-full text-2xl py-8"
@@ -31,6 +31,15 @@ export default function Home() {
             size="lg"
           >
             תרגל מספרים
+          </Button>
+        </Link>
+
+        <Link href="/parent-dashboard">
+          <Button 
+            className="w-full text-xl py-4 mt-4"
+            variant="outline"
+          >
+            לוח בקרה להורים
           </Button>
         </Link>
       </div>
