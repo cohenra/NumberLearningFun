@@ -79,10 +79,6 @@ export default function Practice() {
 
         <div className="text-center mb-12">
           <h2 className="text-2xl mb-4">איפה המספר {currentNumber.hebrewText}?</h2>
-          <NumberCard 
-            number={currentNumber} 
-            autoPlayAudio={true}
-          />
         </div>
 
         <motion.div 
