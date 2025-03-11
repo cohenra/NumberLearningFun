@@ -34,6 +34,16 @@ export default function Home() {
           </Button>
         </Link>
 
+        <Link href="/quick-math">
+          <Button 
+            className="w-full text-2xl py-8"
+            variant="secondary"
+            size="lg"
+          >
+            חשבון מהיר
+          </Button>
+        </Link>
+
         <Link href="/parent-dashboard">
           <Button 
             className="w-full text-xl py-4 mt-4"
