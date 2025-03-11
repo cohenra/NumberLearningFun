@@ -7,7 +7,7 @@ import { SuccessAnimation } from "@/components/ui/success-animation";
 import { WrongAnswerAnimation } from "@/components/ui/wrong-answer-animation";
 import type { Number, InsertProgress } from "@shared/schema";
 import { motion } from "framer-motion";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 export default function Practice() {
   const { data: numbers } = useQuery<Number[]>({ 
@@ -26,6 +26,10 @@ export default function Practice() {
   const saveMutation = useMutation({
     mutationFn: async (progress: InsertProgress) => {
       await apiRequest("POST", "/api/progress", progress);
+    },
+    onSuccess: () => {
+      // Invalidate the progress query to trigger a refetch
+      queryClient.invalidateQueries({ queryKey: ["/api/progress"] });
     }
   });
 
