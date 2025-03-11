@@ -13,19 +13,19 @@ export class MemStorage implements IStorage {
   constructor() {
     this.numbers = new Map();
     this.currentId = 1;
-    
+
     // Initialize with Hebrew numbers 1-10
     const initialNumbers = [
-      { value: 1, hebrewText: "אחת", audioUrl: "/audio/one.mp3" },
-      { value: 2, hebrewText: "שתיים", audioUrl: "/audio/two.mp3" },
-      { value: 3, hebrewText: "שלוש", audioUrl: "/audio/three.mp3" },
-      { value: 4, hebrewText: "ארבע", audioUrl: "/audio/four.mp3" },
-      { value: 5, hebrewText: "חמש", audioUrl: "/audio/five.mp3" },
-      { value: 6, hebrewText: "שש", audioUrl: "/audio/six.mp3" },
-      { value: 7, hebrewText: "שבע", audioUrl: "/audio/seven.mp3" },
-      { value: 8, hebrewText: "שמונה", audioUrl: "/audio/eight.mp3" },
-      { value: 9, hebrewText: "תשע", audioUrl: "/audio/nine.mp3" },
-      { value: 10, hebrewText: "עשר", audioUrl: "/audio/ten.mp3" },
+      { value: 1, hebrewText: "אחת" },
+      { value: 2, hebrewText: "שתיים" },
+      { value: 3, hebrewText: "שלוש" },
+      { value: 4, hebrewText: "ארבע" },
+      { value: 5, hebrewText: "חמש" },
+      { value: 6, hebrewText: "שש" },
+      { value: 7, hebrewText: "שבע" },
+      { value: 8, hebrewText: "שמונה" },
+      { value: 9, hebrewText: "תשע" },
+      { value: 10, hebrewText: "עשר" },
     ];
 
     initialNumbers.forEach(num => {

@@ -1,18 +1,18 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 interface AudioPlayerProps {
-  src: string;
+  text: string;
   autoPlay?: boolean;
 }
 
-export function AudioPlayer({ src, autoPlay = false }: AudioPlayerProps) {
-  const audioRef = useRef<HTMLAudioElement>(null);
-
+export function AudioPlayer({ text, autoPlay = false }: AudioPlayerProps) {
   useEffect(() => {
-    if (autoPlay && audioRef.current) {
-      audioRef.current.play();
+    if (autoPlay) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'he-IL';
+      speechSynthesis.speak(utterance);
     }
-  }, [src, autoPlay]);
+  }, [text, autoPlay]);
 
-  return <audio ref={audioRef} src={src} />;
+  return null;
 }
