@@ -145,8 +145,11 @@ export default function QuickMath() {
         ) : problem && (
           <>
             <div className="text-center mb-12">
-              <h2 className="text-4xl mb-4 rtl">
-                {problem.num1} {problem.operator} {problem.num2} = ?
+              <h2 className="text-4xl mb-4 text-right flex justify-center gap-4 items-center">
+                <span>= ?</span>
+                <span>{problem.num2}</span>
+                <span>{problem.operator}</span>
+                <span>{problem.num1}</span>
               </h2>
             </div>
 
