@@ -55,6 +55,7 @@ export async function setupVite(app: Express, server: Server) {
     }
 
     try {
+      console.log(`Serving index.html for path: ${url}`);
       const clientTemplate = path.resolve(
         __dirname,
         "..",

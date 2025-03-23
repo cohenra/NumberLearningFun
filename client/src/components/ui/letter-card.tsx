@@ -40,8 +40,11 @@ export function LetterCard({
   };
 
   // Get the letter text based on type and current language
-  let displayText = letter.type === 'hebrew' ? letter.hebrewText : letter.englishText;
-  let secondaryText = letter.type === 'hebrew' ? letter.transliteration : "";
+  // For Hebrew letters, display just the letter itself, not the full name
+  let displayText = letter.type === 'hebrew' ? letter.value : letter.englishText;
+  
+  // Only show transliteration for English letters, not for Hebrew
+  let secondaryText = letter.type === 'hebrew' ? "" : letter.transliteration;
   
   return (
     <motion.div
@@ -49,21 +52,21 @@ export function LetterCard({
       whileTap={{ scale: 0.95 }}
     >
       <Card 
-        className={`w-40 h-40 cursor-pointer ${
-          isSelected ? "border-4 border-primary" : ""
-        }`}
+        className={`cursor-pointer transition-colors ${isSelected ? 'bg-primary text-primary-foreground' : 'hover:bg-primary/10'}`}
         onClick={handleClick}
       >
-        <CardContent className="flex flex-col items-center justify-center h-full">
-          <span className="text-6xl font-bold">{displayText}</span>
-          {secondaryText && <span className="text-2xl mt-1">{secondaryText}</span>}
-          {autoPlayAudio && (
-            <AudioPlayer 
-              text={letter.type === 'hebrew' ? letter.hebrewText : letter.englishText} 
-              lang={letter.type === 'hebrew' ? 'he-IL' : 'en-US'} 
-              autoPlay={autoPlayAudio} 
-            />
-          )}
+        <CardContent className="flex items-center justify-center p-8">
+          <div className="text-center">
+            <span className="text-4xl font-bold block">
+              {letter.type === 'hebrew' ? letter.value : letter.englishText}
+            </span>
+            <span className="text-sm block mt-2">
+              {letter.type === 'hebrew' 
+                ? locale === 'he' ? letter.hebrewText : letter.transliteration
+                : locale === 'he' ? letter.transliteration : letter.englishText
+              }
+            </span>
+          </div>
         </CardContent>
       </Card>
     </motion.div>

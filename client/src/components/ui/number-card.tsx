@@ -41,15 +41,18 @@ export function NumberCard({
       whileTap={{ scale: 0.95 }}
     >
       <Card 
-        className={`w-40 h-40 cursor-pointer ${
-          isSelected ? "border-4 border-primary" : ""
-        }`}
+        className={`cursor-pointer transition-colors ${isSelected ? 'bg-primary text-primary-foreground' : 'hover:bg-primary/10'}`}
         onClick={handleClick}
       >
-        <CardContent className="flex flex-col items-center justify-center h-full">
-          <span className="text-6xl font-bold">{number.value}</span>
-          <span className="text-3xl mt-2 font-bold">{numberText}</span>
-          {autoPlayAudio && <AudioPlayer text={numberText} lang={locale === 'he' ? 'he-IL' : 'en-US'} autoPlay={autoPlayAudio} />}
+        <CardContent className="flex items-center justify-center p-8">
+          <div className="text-center">
+            <span className="text-4xl font-bold block">
+              {number.value}
+            </span>
+            <span className="text-sm block mt-2">
+              {numberText}
+            </span>
+          </div>
         </CardContent>
       </Card>
     </motion.div>

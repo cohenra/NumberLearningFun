@@ -9,10 +9,11 @@ import type { Number, InsertProgress } from "@shared/schema";
 import { motion } from "framer-motion";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useLanguage } from "@/lib/i18n/languageContext";
+import { playCorrectSound, playIncorrectSound, speakText } from "@/lib/utils";
 
 export default function Practice() {
   const { t, locale } = useLanguage();
-  const { data: numbers } = useQuery<Number[]>({ 
+  const { data: numbers, isLoading } = useQuery<Number[]>({ 
     queryKey: ["/api/numbers"]
   });
 
@@ -36,7 +37,7 @@ export default function Practice() {
   });
 
   useEffect(() => {
-    if (numbers) {
+    if (numbers && numbers.length >= 4) {
       generateNewQuestion();
     }
   }, [numbers]);
@@ -67,6 +68,14 @@ export default function Practice() {
 
     // Combine and shuffle all options
     setOptions([answer, ...otherOptions].sort(() => Math.random() - 0.5));
+
+    // Speak the question after a short delay
+    setTimeout(() => {
+      const questionText = locale === 'he' 
+        ? `${t('practice.question')} ${answer.hebrewText}?` 
+        : `${t('practice.question')} ${t(`numbers.${answer.value}`)}?`;
+      speakText(questionText, locale === 'he' ? 'he-IL' : 'en-US');
+    }, 500);
   };
 
   const handleSelect = (selected: Number) => {
@@ -75,6 +84,7 @@ export default function Practice() {
     if (selected.id === currentNumber?.id) {
       setScore(prev => prev + 1);
       setShowSuccess(true);
+      playCorrectSound();
       setTimeout(() => {
         setShowSuccess(false);
         generateNewQuestion();
@@ -82,6 +92,7 @@ export default function Practice() {
     } else {
       setWrongNumber(locale === 'he' ? selected.hebrewText : t(`numbers.${selected.value}`));
       setShowWrong(true);
+      playIncorrectSound();
       setTimeout(() => {
         setShowWrong(false);
       }, 2000);
@@ -93,48 +104,95 @@ export default function Practice() {
     }
   };
 
-  if (!currentNumber || !options.length) {
-    return <div>{t('common.loading')}</div>;
+  // When component mounts, speak the initial question
+  useEffect(() => {
+    if (currentNumber) {
+      const questionText = locale === 'he' 
+        ? `${t('practice.question')} ${currentNumber.hebrewText}?` 
+        : `${t('practice.question')} ${t(`numbers.${currentNumber.value}`)}?`;
+      speakText(questionText, locale === 'he' ? 'he-IL' : 'en-US');
+    }
+  }, [currentNumber, locale]);
+
+  if (isLoading) {
+    return <div className="min-h-screen bg-gradient-to-b from-blue-100 to-purple-100 p-8 flex items-center justify-center">
+      <div className="text-2xl">{t('common.loading')}</div>
+    </div>;
+  }
+
+  if (!numbers || numbers.length < 4 || !currentNumber || options.length < 4) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-blue-100 to-purple-100 p-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-4xl font-bold">{t('practice.title')}</h1>
+            <div className="flex gap-2">
+              <Link href="/content-select">
+                <Button variant="outline">{t('nav.back')}</Button>
+              </Link>
+              <Link href="/">
+                <Button variant="outline">{t('nav.home')}</Button>
+              </Link>
+            </div>
+          </div>
+          <div className="flex justify-center items-center min-h-[50vh]">
+            <div className="text-xl">{t('common.notEnoughData')}</div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   // Get the current number text based on the language
   const currentNumberText = locale === 'he' ? currentNumber.hebrewText : t(`numbers.${currentNumber.value}`);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-purple-100 p-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-purple-100 p-8 pt-14 md:pt-16">
+      <div className="max-w-lg mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-4xl font-bold">{t('practice.title')}</h1>
-            <p className="text-xl mt-2">{t('practice.score')} {score}</p>
+            <h1 className="text-3xl font-bold">{t('practice.title')}</h1>
+            <div className="flex gap-4 mt-2">
+              <p className="text-xl">{t('practice.score')} {score}</p>
+            </div>
           </div>
-          <Link href="/">
-            <Button 
-              variant="outline" 
-              onClick={saveProgress}
-            >
-              {t('nav.home')}
-            </Button>
-          </Link>
+          <div className="flex gap-2">
+            <Link href="/content-select">
+              <Button 
+                variant="outline"
+                onClick={saveProgress}
+              >
+                {t('nav.back')}
+              </Button>
+            </Link>
+            <Link href="/">
+              <Button 
+                variant="outline"
+                onClick={saveProgress}
+              >
+                {t('nav.home')}
+              </Button>
+            </Link>
+          </div>
         </div>
 
-        <div className="text-center mb-12">
-          <h2 className="text-2xl mb-4">{t('practice.question')} {currentNumberText}?</h2>
+        <div className="bg-white rounded-xl shadow-lg p-8 mb-6">
+          <h2 className="text-2xl text-center mb-8">{t('practice.question')} {currentNumberText}?</h2>
+          
+          <motion.div 
+            className="grid grid-cols-2 gap-6 mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            {options.map((option) => (
+              <NumberCard
+                key={option.id}
+                number={option}
+                onClick={() => handleSelect(option)}
+              />
+            ))}
+          </motion.div>
         </div>
-
-        <motion.div 
-          className="grid grid-cols-2 gap-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          {options.map((option) => (
-            <NumberCard
-              key={option.id}
-              number={option}
-              onClick={() => handleSelect(option)}
-            />
-          ))}
-        </motion.div>
       </div>
 
       {showSuccess && <SuccessAnimation />}

@@ -30,6 +30,9 @@ app.use((req, res, next) => {
       }
 
       log(logLine);
+    } else {
+      // Log non-API requests as well to help debug routing issues
+      log(`${req.method} ${path} ${res.statusCode} in ${duration}ms (non-API)`);
     }
   });
 

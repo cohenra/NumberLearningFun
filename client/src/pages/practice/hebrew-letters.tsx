@@ -9,10 +9,11 @@ import type { Letter, InsertProgress } from "@shared/schema";
 import { motion } from "framer-motion";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useLanguage } from "@/lib/i18n/languageContext";
+import { playCorrectSound, playIncorrectSound, speakText } from "@/lib/utils";
 
 export default function PracticeHebrewLetters() {
   const { t, locale } = useLanguage();
-  const { data: letters } = useQuery<Letter[]>({ 
+  const { data: letters, isLoading } = useQuery<Letter[]>({ 
     queryKey: ["/api/letters", { type: "hebrew" }],
     queryFn: async () => {
       const response = await fetch("/api/letters?type=hebrew");
@@ -70,6 +71,12 @@ export default function PracticeHebrewLetters() {
 
     // Combine and shuffle all options
     setOptions([answer, ...otherOptions].sort(() => Math.random() - 0.5));
+
+    // Speak the question after a short delay
+    setTimeout(() => {
+      const questionText = `${t('practice.questionLetter')} ${answer.hebrewText}?`;
+      speakText(questionText, 'he-IL');
+    }, 500);
   };
 
   const handleSelect = (selected: Letter) => {
@@ -78,6 +85,7 @@ export default function PracticeHebrewLetters() {
     if (selected.id === currentLetter?.id) {
       setScore(prev => prev + 1);
       setShowSuccess(true);
+      playCorrectSound();
       setTimeout(() => {
         setShowSuccess(false);
         generateNewQuestion();
@@ -85,6 +93,7 @@ export default function PracticeHebrewLetters() {
     } else {
       setWrongLetter(selected.hebrewText);
       setShowWrong(true);
+      playIncorrectSound();
       setTimeout(() => {
         setShowWrong(false);
       }, 2000);
@@ -96,45 +105,90 @@ export default function PracticeHebrewLetters() {
     }
   };
 
-  if (!currentLetter || !options.length) {
-    return <div>{t('common.loading')}</div>;
+  // When component mounts, speak the initial question
+  useEffect(() => {
+    if (currentLetter) {
+      const questionText = `${t('practice.questionLetter')} ${currentLetter.hebrewText}?`;
+      speakText(questionText, 'he-IL');
+    }
+  }, [currentLetter, locale]);
+
+  if (isLoading) {
+    return <div className="min-h-screen bg-gradient-to-b from-blue-100 to-purple-100 p-8 pt-14 md:pt-16 flex items-center justify-center">
+      <div className="text-2xl">{t('common.loading')}</div>
+    </div>;
+  }
+
+  if (!letters || letters.length < 4 || !currentLetter || options.length < 4) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-blue-100 to-purple-100 p-8 pt-14 md:pt-16">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-4xl font-bold">{t('practice.hebrewLettersTitle')}</h1>
+            <div className="flex gap-2">
+              <Link href="/content-select">
+                <Button variant="outline">{t('nav.back')}</Button>
+              </Link>
+              <Link href="/">
+                <Button variant="outline">{t('nav.home')}</Button>
+              </Link>
+            </div>
+          </div>
+          <div className="flex justify-center items-center min-h-[50vh]">
+            <div className="text-xl">{t('common.notEnoughData')}</div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-purple-100 p-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-purple-100 p-8 pt-14 md:pt-16">
+      <div className="max-w-lg mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-4xl font-bold">{t('practice.hebrewLettersTitle')}</h1>
-            <p className="text-xl mt-2">{t('practice.score')} {score}</p>
+            <h1 className="text-3xl font-bold">{t('practice.titleHebrew')}</h1>
+            <div className="flex gap-4 mt-2">
+              <p className="text-xl">{t('practice.score')} {score}</p>
+            </div>
           </div>
-          <Link href="/">
-            <Button 
-              variant="outline" 
-              onClick={saveProgress}
-            >
-              {t('nav.home')}
-            </Button>
-          </Link>
+          <div className="flex gap-2">
+            <Link href="/content-select">
+              <Button 
+                variant="outline"
+                onClick={saveProgress}
+              >
+                {t('nav.back')}
+              </Button>
+            </Link>
+            <Link href="/">
+              <Button 
+                variant="outline"
+                onClick={saveProgress}
+              >
+                {t('nav.home')}
+              </Button>
+            </Link>
+          </div>
         </div>
 
-        <div className="text-center mb-12">
-          <h2 className="text-2xl mb-4">{t('practice.questionLetter')} {currentLetter.hebrewText}?</h2>
+        <div className="bg-white rounded-xl shadow-lg p-8 mb-6">
+          <h2 className="text-2xl text-center mb-8">{t('practice.questionLetter')} {currentLetter?.hebrewText}?</h2>
+          
+          <motion.div 
+            className="grid grid-cols-2 gap-6 mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            {options.map((option) => (
+              <LetterCard
+                key={option.id}
+                letter={option}
+                onClick={() => handleSelect(option)}
+              />
+            ))}
+          </motion.div>
         </div>
-
-        <motion.div 
-          className="grid grid-cols-2 gap-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          {options.map((option) => (
-            <LetterCard
-              key={option.id}
-              letter={option}
-              onClick={() => handleSelect(option)}
-            />
-          ))}
-        </motion.div>
       </div>
 
       {showSuccess && <SuccessAnimation />}

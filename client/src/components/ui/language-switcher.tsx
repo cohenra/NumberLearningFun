@@ -13,7 +13,7 @@ export const LanguageSwitcher: React.FC = () => {
   return (
     <Button 
       variant="outline"
-      className="fixed top-4 right-4 z-50 text-sm px-3 py-1 h-auto"
+      className="fixed top-2 right-2 md:top-4 md:right-4 z-10 text-xs md:text-sm px-2 py-1 h-auto"
       onClick={toggleLanguage}
     >
       {t('common.languageSwitch')}

@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link as WouterLink } from 'wouter';
 
 interface LinkProps {
   href: string;
@@ -9,13 +8,27 @@ interface LinkProps {
 }
 
 export function Link({ href, children, className, onClick }: LinkProps) {
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (onClick) onClick();
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    // Call the original onClick if provided
+    if (onClick) {
+      onClick();
+    }
+    
+    // Update the browser history
+    window.history.pushState(null, '', href);
+    
+    // Dispatch an event to notify about the navigation
+    window.dispatchEvent(new CustomEvent('pushstate'));
+    
+    // Scroll to top on navigation
+    window.scrollTo(0, 0);
   };
-
+  
   return (
-    <WouterLink href={href} className={className} onClick={handleClick}>
+    <a href={href} className={className} onClick={handleClick}>
       {children}
-    </WouterLink>
+    </a>
   );
 } 
