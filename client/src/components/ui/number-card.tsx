@@ -49,9 +49,6 @@ export function NumberCard({
             <span className="text-4xl font-bold block">
               {number.value}
             </span>
-            <span className="text-sm block mt-2">
-              {numberText}
-            </span>
           </div>
         </CardContent>
       </Card>

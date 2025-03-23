@@ -60,12 +60,6 @@ export function LetterCard({
             <span className="text-4xl font-bold block">
               {letter.type === 'hebrew' ? letter.value : letter.englishText}
             </span>
-            <span className="text-sm block mt-2">
-              {letter.type === 'hebrew' 
-                ? locale === 'he' ? letter.hebrewText : letter.transliteration
-                : locale === 'he' ? letter.transliteration : letter.englishText
-              }
-            </span>
           </div>
         </CardContent>
       </Card>

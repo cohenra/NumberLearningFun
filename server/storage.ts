@@ -33,7 +33,7 @@ export class MemStorage implements IStorage {
     this.currentLetterId = 1;
     this.currentProgressId = 1;
 
-    // Initialize with Hebrew numbers 1-10
+    // Initialize with Hebrew numbers 1-20
     const initialNumbers = [
       { value: 1, hebrewText: "אחת" },
       { value: 2, hebrewText: "שתיים" },
@@ -45,6 +45,16 @@ export class MemStorage implements IStorage {
       { value: 8, hebrewText: "שמונה" },
       { value: 9, hebrewText: "תשע" },
       { value: 10, hebrewText: "עשר" },
+      { value: 11, hebrewText: "אחת עשרה" },
+      { value: 12, hebrewText: "שתים עשרה" },
+      { value: 13, hebrewText: "שלוש עשרה" },
+      { value: 14, hebrewText: "ארבע עשרה" },
+      { value: 15, hebrewText: "חמש עשרה" },
+      { value: 16, hebrewText: "שש עשרה" },
+      { value: 17, hebrewText: "שבע עשרה" },
+      { value: 18, hebrewText: "שמונה עשרה" },
+      { value: 19, hebrewText: "תשע עשרה" },
+      { value: 20, hebrewText: "עשרים" },
     ];
 
     initialNumbers.forEach(num => {
