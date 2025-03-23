@@ -1,8 +1,11 @@
-import { Link } from "wouter";
+import { Link } from "@/components/ui/link";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { useLanguage } from "@/lib/i18n/languageContext";
 
 export default function Home() {
+  const { t, dir } = useLanguage();
+  
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-100 to-purple-100 flex flex-col items-center justify-center p-4">
       <motion.div
@@ -10,27 +13,27 @@ export default function Home() {
         animate={{ y: 0, opacity: 1 }}
         className="text-center mb-12"
       >
-        <h1 className="text-5xl font-bold mb-4 text-primary">בואו נלמד מספרים!</h1>
-        <p className="text-2xl text-gray-600">משחק כיף ללימוד מספרים בעברית</p>
+        <h1 className="text-5xl font-bold mb-4 text-primary">{t('app.title')}</h1>
+        <p className="text-2xl text-gray-600">{t('app.subtitle')}</p>
       </motion.div>
 
       <div className="flex flex-col gap-4 w-full max-w-md">
-        <Link href="/learn">
+        <Link href="/content-select">
           <Button 
             className="w-full text-2xl py-8"
             size="lg"
           >
-            למד מספרים
+            {t('nav.learn')}
           </Button>
         </Link>
 
-        <Link href="/practice">
+        <Link href="/content-select?mode=practice">
           <Button 
             className="w-full text-2xl py-8"
             variant="secondary"
             size="lg"
           >
-            תרגל מספרים
+            {t('nav.practice')}
           </Button>
         </Link>
 
@@ -40,7 +43,7 @@ export default function Home() {
             variant="secondary"
             size="lg"
           >
-            חשבון מהיר
+            {t('nav.quickMath')}
           </Button>
         </Link>
 
@@ -49,7 +52,7 @@ export default function Home() {
             className="w-full text-xl py-4 mt-4"
             variant="outline"
           >
-            לוח בקרה להורים
+            {t('nav.parentDashboard')}
           </Button>
         </Link>
       </div>

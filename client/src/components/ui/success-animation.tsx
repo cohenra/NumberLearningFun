@@ -1,8 +1,11 @@
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { useEffect } from "react";
+import { useLanguage } from "@/lib/i18n/languageContext";
 
 export function SuccessAnimation() {
+  const { t } = useLanguage();
+  
   useEffect(() => {
     confetti({
       particleCount: 100,
@@ -22,8 +25,8 @@ export function SuccessAnimation() {
         animate={{ y: 0, opacity: 1 }}
         className="bg-white p-8 rounded-lg text-center"
       >
-        <h2 className="text-4xl font-bold mb-4">🎉 כל הכבוד! 🎉</h2>
-        <p className="text-2xl">נהדר! המשך כך!</p>
+        <h2 className="text-4xl font-bold mb-4">🎉 {t('practice.correct')} 🎉</h2>
+        <p className="text-2xl">{t('voiceCommands.correctAnswer')}</p>
       </motion.div>
     </motion.div>
   );

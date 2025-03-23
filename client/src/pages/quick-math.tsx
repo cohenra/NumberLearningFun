@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Link } from "wouter";
+import { Link } from "@/components/ui/link";
+import { Input } from "@/components/ui/input";
 import { SuccessAnimation } from "@/components/ui/success-animation";
 import { WrongAnswerAnimation } from "@/components/ui/wrong-answer-animation";
 import { motion } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { InsertProgress } from "@shared/schema";
+import { useLanguage } from "@/lib/i18n/languageContext";
 
 type Problem = {
   num1: number;
@@ -18,6 +20,7 @@ type Problem = {
 };
 
 export default function QuickMath() {
+  const { t } = useLanguage();
   const [problem, setProblem] = useState<Problem | null>(null);
   const [score, setScore] = useState(0);
   const [totalAttempts, setTotalAttempts] = useState(0);
@@ -126,21 +129,21 @@ export default function QuickMath() {
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-4xl font-bold">חשבון מהיר</h1>
+            <h1 className="text-4xl font-bold">{t('quickMath.title')}</h1>
             <div className="flex gap-4 mt-2">
-              <p className="text-xl">ניקוד: {score}</p>
-              <p className="text-xl">זמן: {timeLeft} שניות</p>
+              <p className="text-xl">{t('quickMath.score')} {score}</p>
+              <p className="text-xl">{t('common.time')}: {timeLeft} {t('common.seconds')}</p>
             </div>
           </div>
           <Link href="/">
-            <Button variant="outline">חזרה</Button>
+            <Button variant="outline">{t('nav.home')}</Button>
           </Link>
         </div>
 
         {!isGameActive ? (
           <div className="text-center">
-            <h2 className="text-2xl mb-4">מוכנים למשחק חשבון מהיר?</h2>
-            <Button size="lg" onClick={startGame}>התחל!</Button>
+            <h2 className="text-2xl mb-4">{t('quickMath.readyToPlay')}</h2>
+            <Button size="lg" onClick={startGame}>{t('quickMath.start')}</Button>
           </div>
         ) : problem && (
           <>

@@ -18,6 +18,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(number);
   });
 
+  // Letters endpoints
+  app.get("/api/letters", async (req, res) => {
+    const type = req.query.type as string | undefined;
+    const letters = await storage.getLetters(type);
+    res.json(letters);
+  });
+
+  app.get("/api/letters/:id", async (req, res) => {
+    const letter = await storage.getLetter(parseInt(req.params.id));
+    if (!letter) {
+      res.status(404).json({ message: "Letter not found" });
+      return;
+    }
+    res.json(letter);
+  });
+
   // Learning progress endpoints
   app.post("/api/progress", async (req, res) => {
     try {

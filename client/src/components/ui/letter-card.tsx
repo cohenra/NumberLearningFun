@@ -1,28 +1,35 @@
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { AudioPlayer } from "./audio-player";
-import type { Number } from "@shared/schema";
+import type { Letter } from "@shared/schema";
 import { useLanguage } from "@/lib/i18n/languageContext";
 
-interface NumberCardProps {
-  number: Number;
+interface LetterCardProps {
+  letter: Letter;
   onClick?: () => void;
   isSelected?: boolean;
   autoPlayAudio?: boolean;
 }
 
-export function NumberCard({ 
-  number, 
+export function LetterCard({ 
+  letter, 
   onClick, 
   isSelected = false,
   autoPlayAudio = false 
-}: NumberCardProps) {
-  const { t, locale } = useLanguage();
+}: LetterCardProps) {
+  const { locale } = useLanguage();
   
   const handleClick = () => {
     // Play audio on click with the correct language
-    const text = locale === 'he' ? number.hebrewText : t(`numbers.${number.value}`);
-    const lang = locale === 'he' ? 'he-IL' : 'en-US';
+    let text, lang;
+    
+    if (letter.type === 'hebrew') {
+      text = letter.hebrewText;
+      lang = 'he-IL';
+    } else {
+      text = letter.englishText;
+      lang = 'en-US';
+    }
     
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang;
@@ -32,9 +39,10 @@ export function NumberCard({
     if (onClick) onClick();
   };
 
-  // Get the number text based on current language
-  const numberText = locale === 'he' ? number.hebrewText : t(`numbers.${number.value}`);
-
+  // Get the letter text based on type and current language
+  let displayText = letter.type === 'hebrew' ? letter.hebrewText : letter.englishText;
+  let secondaryText = letter.type === 'hebrew' ? letter.transliteration : "";
+  
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
@@ -47,11 +55,17 @@ export function NumberCard({
         onClick={handleClick}
       >
         <CardContent className="flex flex-col items-center justify-center h-full">
-          <span className="text-6xl font-bold">{number.value}</span>
-          <span className="text-3xl mt-2 font-bold">{numberText}</span>
-          {autoPlayAudio && <AudioPlayer text={numberText} lang={locale === 'he' ? 'he-IL' : 'en-US'} autoPlay={autoPlayAudio} />}
+          <span className="text-6xl font-bold">{displayText}</span>
+          {secondaryText && <span className="text-2xl mt-1">{secondaryText}</span>}
+          {autoPlayAudio && (
+            <AudioPlayer 
+              text={letter.type === 'hebrew' ? letter.hebrewText : letter.englishText} 
+              lang={letter.type === 'hebrew' ? 'he-IL' : 'en-US'} 
+              autoPlay={autoPlayAudio} 
+            />
+          )}
         </CardContent>
       </Card>
     </motion.div>
   );
-}
+} 
